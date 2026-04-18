@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Minimal Pipecat backend for a local real-time interviewer demo"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-  "pipecat-ai[runner,webrtc,deepgram,anthropic,elevenlabs,silero]>=0.0.108,<0.0.109",
+  "pipecat-ai[runner,webrtc,deepgram,anthropic,elevenlabs,gradium,silero]>=0.0.108,<0.0.109",
   "python-dotenv>=1.0.1,<2",
 ]
 

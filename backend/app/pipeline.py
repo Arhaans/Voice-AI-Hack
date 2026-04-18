@@ -18,13 +18,47 @@ from pipecat.processors.aggregators.llm_response_universal import (
 )
 from pipecat.services.anthropic.llm import AnthropicLLMService
 from pipecat.services.deepgram.stt import DeepgramSTTService
-from pipecat.services.elevenlabs.tts import ElevenLabsTTSService
 from pipecat.services.tts_service import TextAggregationMode
 
 from app.client_events import send_server_event
 from app.config import Settings
 from app.instrumentation import TurnTimingProbe
 from app.prompts import OPENING_GREETING, PRODUCT_STRATEGIST_SYSTEM_PROMPT
+
+
+def build_tts_service(settings: Settings):
+    if settings.tts_provider == "gradium":
+        try:
+            from pipecat.services.gradium.tts import GradiumTTSService
+        except ModuleNotFoundError as exc:
+            raise RuntimeError(
+                "Gradium TTS support is not installed. Reinstall the backend with Gradium extras "
+                "before using TTS_PROVIDER=gradium."
+            ) from exc
+
+        logger.info("Using Gradium TTS provider")
+        return GradiumTTSService(
+            api_key=settings.gradium_api_key,
+            voice_id=settings.gradium_voice_id,
+            model=settings.gradium_model,
+            url=settings.gradium_tts_url,
+        )
+
+    from pipecat.services.elevenlabs.tts import ElevenLabsTTSService
+
+    logger.info("Using ElevenLabs TTS provider")
+    return ElevenLabsTTSService(
+        api_key=settings.elevenlabs_api_key,
+        settings=ElevenLabsTTSService.Settings(
+            voice=settings.elevenlabs_voice_id,
+            model=settings.elevenlabs_model,
+            speed=1.08,
+            stability=0.25,
+            similarity_boost=0.8,
+        ),
+        auto_mode=False,
+        text_aggregation_mode=TextAggregationMode.TOKEN,
+    )
 
 
 async def run_voice_pipeline(transport, settings: Settings) -> None:
@@ -49,18 +83,7 @@ async def run_voice_pipeline(transport, settings: Settings) -> None:
         ),
     )
 
-    tts = ElevenLabsTTSService(
-        api_key=settings.elevenlabs_api_key,
-        settings=ElevenLabsTTSService.Settings(
-            voice=settings.elevenlabs_voice_id,
-            model=settings.elevenlabs_model,
-            speed=1.08,
-            stability=0.25,
-            similarity_boost=0.8,
-        ),
-        auto_mode=False,
-        text_aggregation_mode=TextAggregationMode.TOKEN,
-    )
+    tts = build_tts_service(settings)
 
     context = LLMContext(messages=[])
     context_aggregator = LLMContextAggregatorPair(
