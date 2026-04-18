@@ -214,9 +214,6 @@ Browser                    Backend                      Services
 | `NEXT_PUBLIC_PIPECAT_BASE_URL` | ✅ | Backend URL (default: `http://localhost:7860`) |
 | `ANTHROPIC_API_KEY` | ✅ | For PRD generation |
 
-## Team
-
-Built by **Arhaan** and **Vishal** for the Pipecat Voice AI Hackathon 2026.
 
 ## License
 
