@@ -29,8 +29,31 @@ A real-time voice AI that interviews you about your product idea — like talkin
 | **Transport** | SmallWebRTC (browser ↔ bot) |
 | **STT** | Deepgram Nova-3 (streaming) |
 | **LLM** | Anthropic Claude Haiku |
-| **TTS** | Gradium / ElevenLabs Flash |
+| **TTS** | **Gradium** (primary) / ElevenLabs Flash |
 | **PRD Generation** | Anthropic Claude (async) |
+
+## Powered by Gradium 🎙️
+
+We use **[Gradium](https://gradium.ai)** as our primary Text-to-Speech provider for Vincent's voice. Gradium delivers:
+
+- **Ultra-low latency streaming** — Critical for natural voice conversations where every millisecond matters
+- **High-quality, natural-sounding voices** — Vincent sounds like a real PM, not a robot
+- **WebSocket-based streaming** — Seamlessly integrates with Pipecat's real-time pipeline
+- **Token-level audio generation** — Speech starts as soon as the first tokens arrive from the LLM
+
+In our pipeline, Gradium receives text chunks from Claude and streams audio back to the browser in real-time, enabling the fluid back-and-forth conversation that makes Vincent feel like a real product strategist you're talking to.
+
+```python
+# How we use Gradium in our Pipecat pipeline
+from pipecat.services.gradium.tts import GradiumTTSService
+
+tts = GradiumTTSService(
+    api_key=settings.gradium_api_key,
+    voice_id=settings.gradium_voice_id,
+    model=settings.gradium_model,
+    url="wss://eu.api.gradium.ai/api/speech/tts",
+)
+```
 
 ## Project Structure
 
