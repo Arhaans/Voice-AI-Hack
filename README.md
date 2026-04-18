@@ -28,7 +28,7 @@ A real-time voice AI that interviews you about your product idea — like talkin
 | **Backend** | Python 3.12, Pipecat |
 | **Transport** | SmallWebRTC (browser ↔ bot) |
 | **STT** | Deepgram Nova-3 (streaming) |
-| **LLM** | Anthropic Claude Haiku |
+| **LLM** | Open AI GPT 5.2 |
 | **TTS** | **Gradium** (primary) / ElevenLabs Flash |
 | **PRD Generation** | Anthropic Claude (async) |
 
@@ -205,7 +205,7 @@ Browser                    Backend                      Services
 | `GRADIUM_VOICE_ID` | If gradium | — | Gradium voice ID |
 | `ELEVENLABS_API_KEY` | If elevenlabs | — | ElevenLabs key |
 | `ELEVENLABS_VOICE_ID` | If elevenlabs | — | ElevenLabs voice ID |
-| `ANTHROPIC_MODEL` | ❌ | `claude-3-haiku-20240307` | Model for voice |
+| `ANTHROPIC_MODEL` | ❌ | `GPT 5.2` | Model for voice |
 
 ### Frontend Environment Variables
 
