@@ -1,0 +1,43 @@
+.DS_Store
+.env
+.env.local
+.env.*
+!.env.example
+!.env.local.example
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.next/
+node_modules/
+dist/
+build/
+coverage/
+package-lock.json
+yarn.lock
+*.egg-info/
+
+# Additional Python
+venv/
+.venv/
+*.egg
+*.whl
+.Python
+pip-log.txt
+
+# Additional Node
+.pnpm-store/
+*.log
+npm-debug.log*
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/settings.json
+
+# OS
+Thumbs.db
