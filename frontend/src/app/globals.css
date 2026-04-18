@@ -3,28 +3,96 @@
 @tailwind utilities;
 
 :root {
-  --background: 222 59% 5%;
-  --foreground: 210 40% 98%;
-  --card: 220 44% 10%;
-  --card-foreground: 210 40% 98%;
-  --border: 217 32% 18%;
-  --muted: 217 32% 18%;
-  --muted-foreground: 215 20% 70%;
-  --primary: 191 96% 68%;
-  --primary-foreground: 222 59% 5%;
-  --accent: 199 89% 48%;
+  --background: 0 0% 100%;
+  --foreground: 0 0% 4%;
+  --surface: 0 0% 97%;
+  --surface-raised: 0 0% 100%;
+  --border: 0 0% 90%;
+  --border-subtle: 0 0% 94%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --orange: 24 95% 53%;
+  --orange-deep: 20 90% 38%;
+  --orange-light: 30 100% 92%;
+  --primary: 24 95% 53%;
+  --primary-foreground: 0 0% 100%;
 }
 
 * {
   border-color: hsl(var(--border));
+  box-sizing: border-box;
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
+html,
 body {
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden; /* individual pages manage their own scroll */
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+  font-family: "Libertinus Mono", monospace;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* Wave button animation */
+.wave-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.wave-char {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.wave-btn:hover .wave-char {
+  animation: charWave 0.5s ease forwards;
+  animation-delay: calc(var(--char-index) * 0.035s);
+}
+
+@keyframes charWave {
+  0%   { transform: translateY(0px); }
+  30%  { transform: translateY(-5px); }
+  60%  { transform: translateY(1px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Orb glow utilities */
+.shadow-orb-orange {
+  box-shadow:
+    0 0 32px rgba(249, 115, 22, 0.35),
+    0 0 80px rgba(249, 115, 22, 0.18),
+    0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-orb-dark {
+  box-shadow:
+    0 0 40px rgba(10, 10, 10, 0.18),
+    0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-card {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
