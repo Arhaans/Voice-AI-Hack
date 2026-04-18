@@ -27,7 +27,9 @@ export interface InterviewState {
   transportState: string;
   localAudioLevel: number;
   remoteAudioLevel: number;
+  remoteAudioActive: boolean;
   transcripts: TranscriptBubble[];
   timings: TimingEvent[];
   errorMessage: string | null;
+  audioErrorMessage: string | null;
 }

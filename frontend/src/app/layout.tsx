@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Voice Interviewer Demo",
-  description: "Minimal real-time AI interviewer demo",
+  title: "Voice AI Hack",
+  description: "Real-time AI product strategist that turns a voice conversation into a PRD",
 };
 
 export default function RootLayout({

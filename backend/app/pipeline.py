@@ -24,7 +24,7 @@ from pipecat.services.tts_service import TextAggregationMode
 from app.client_events import send_server_event
 from app.config import Settings
 from app.instrumentation import TurnTimingProbe
-from app.prompts import INTERVIEWER_SYSTEM_PROMPT, OPENING_GREETING
+from app.prompts import OPENING_GREETING, PRODUCT_STRATEGIST_SYSTEM_PROMPT
 
 
 async def run_voice_pipeline(transport, settings: Settings) -> None:
@@ -43,7 +43,7 @@ async def run_voice_pipeline(transport, settings: Settings) -> None:
         api_key=settings.anthropic_api_key,
         settings=AnthropicLLMService.Settings(
             model=settings.anthropic_model,
-            system_instruction=INTERVIEWER_SYSTEM_PROMPT,
+            system_instruction=PRODUCT_STRATEGIST_SYSTEM_PROMPT,
             max_tokens=180,
             temperature=0.3,
         ),
