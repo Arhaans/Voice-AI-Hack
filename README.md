@@ -1,177 +1,200 @@
-# Voice AI Recruiter
+# Talk Your Idea Into a PRD
 
-Real-time local demo of an AI recruiter running a natural screening conversation over voice.
+> Voice-first product discovery. Talk to Vincent, your AI product strategist, and get an implementation-ready PRD in minutes.
 
-The product is intentionally narrow:
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.12-blue.svg)
+![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)
 
-- thin Next.js frontend
-- Python Pipecat backend
-- low-latency browser-to-bot audio with SmallWebRTC
-- streaming STT, LLM, and TTS
-- premium single-screen voice UI
+## What is this?
 
-## Demo
+A real-time voice AI that interviews you about your product idea — like talking to a sharp senior PM — then generates a professional Product Requirements Document you can hand directly to an engineer or paste into Claude/GPT for implementation.
 
-The current use case is a recruiter-style screening conversation.
+**Built for the Pipecat Voice AI Hackathon.**
 
-The bot is designed to:
+## Demo Flow
 
-- sound warm, confident, and conversational
-- ask one question at a time
-- ask relevant follow-up questions
-- maintain context across the conversation
-- make at least one natural memory callback
-- stay concise enough for a strong 60-90 second recording
+1. Click "Start Session" and describe your product idea
+2. Vincent asks smart follow-up questions, challenges weak assumptions, and pushes for specifics
+3. When you're done, click "End Session"
+4. Get a beautifully formatted PRD with user stories, acceptance criteria, and technical constraints
+5. One-click "Copy Claude Prompt" to continue building with AI
 
 ## Stack
 
-- Frontend: Next.js + TypeScript + Tailwind
-- Backend: Python + Pipecat
-- Transport: SmallWebRTC
-- STT: Deepgram Nova-3 streaming over WebSocket
-- LLM: Anthropic Claude via configurable model ID
-- TTS: ElevenLabs Flash streaming
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Next.js 15, React, TypeScript, Tailwind, Three.js (PlasmaVisualizer) |
+| **Backend** | Python 3.12, Pipecat |
+| **Transport** | SmallWebRTC (browser ↔ bot) |
+| **STT** | Deepgram Nova-3 (streaming) |
+| **LLM** | Anthropic Claude Haiku |
+| **TTS** | Gradium / ElevenLabs Flash |
+| **PRD Generation** | Anthropic Claude (async) |
 
 ## Project Structure
 
-```text
+```
 .
 ├── backend/
 │   ├── app/
-│   │   ├── client_events.py
-│   │   ├── config.py
-│   │   ├── instrumentation.py
-│   │   ├── pipeline.py
-│   │   └── prompts.py
-│   ├── bot.py
+│   │   ├── config.py          # Environment & settings
+│   │   ├── pipeline.py        # Pipecat pipeline (STT → LLM → TTS)
+│   │   ├── prompts.py         # Vincent's system prompt
+│   │   ├── client_events.py   # WebRTC event handling
+│   │   └── instrumentation.py # Latency tracking
+│   ├── bot.py                 # Entry point
 │   └── pyproject.toml
 ├── frontend/
 │   ├── src/app/
+│   │   ├── page.tsx           # Home dashboard
+│   │   ├── session/page.tsx   # Voice session page
+│   │   └── api/generate-prd/  # PRD generation endpoint
 │   ├── src/components/ui/
-│   ├── src/hooks/
-│   ├── src/lib/
-│   └── package.json
+│   │   └── voice-chat.tsx     # Main UI component
+│   └── src/hooks/
+│       └── use-pipecat-interview.ts
 └── README.md
 ```
 
-## How It Works
+## Quick Start
 
-1. The browser opens the Next.js app and requests microphone access.
-2. The frontend connects to the Pipecat backend over SmallWebRTC.
-3. User audio streams to Deepgram for real-time transcription.
-4. Pipecat maintains conversation state and sends the transcript to Anthropic.
-5. Anthropic streams the recruiter response.
-6. ElevenLabs starts speaking the response as soon as useful text is available.
-7. Audio returns to the browser over WebRTC while transcript and timing events update the UI.
-
-## Requirements
+### Prerequisites
 
 - macOS or Linux
-- `conda`
-- `pnpm`
-- API keys for:
-  - Deepgram
-  - Anthropic
-  - ElevenLabs
+- Python 3.12 (via conda)
+- Node.js 18+ & pnpm
+- API keys: Deepgram, Anthropic, ElevenLabs or Gradium
 
-## Backend Setup
-
-Always use a dedicated conda environment for the backend.
+### 1. Backend Setup
 
 ```bash
-conda create -n voice-interviewer-demo python=3.12
-conda activate voice-interviewer-demo
+# Create conda environment
+conda create -n voice-ai-hack python=3.12
+conda activate voice-ai-hack
+
+# Install backend
 pip install -e ./backend
-```
 
-Create the backend env file:
-
-```bash
+# Create .env
 cp backend/.env.example backend/.env
 ```
 
-Required values:
+Edit `backend/.env`:
 
 ```bash
-DEEPGRAM_API_KEY=...
-ANTHROPIC_API_KEY=...
-ELEVENLABS_API_KEY=...
-ELEVENLABS_VOICE_ID=...
+DEEPGRAM_API_KEY=your-key
+ANTHROPIC_API_KEY=your-key
+
+# Choose one TTS provider:
+TTS_PROVIDER=gradium  # or "elevenlabs"
+
+# If using Gradium:
+GRADIUM_API_KEY=your-key
+GRADIUM_VOICE_ID=your-voice-id
+
+# If using ElevenLabs:
+ELEVENLABS_API_KEY=your-key
+ELEVENLABS_VOICE_ID=your-voice-id
 ```
 
-Optional overrides:
+Start the backend:
 
 ```bash
-ANTHROPIC_MODEL=claude-3-haiku-20240307
-DEEPGRAM_MODEL=nova-3
-ELEVENLABS_MODEL=eleven_flash_v2_5
+conda activate voice-ai-hack
+python backend/bot.py -t webrtc --host 127.0.0.1 --port 7860
 ```
 
-Notes:
-
-- `ELEVENLABS_VOICE_ID` must be a voice ID that actually exists for the ElevenLabs account behind your API key.
-- `ANTHROPIC_MODEL` should be set to a model ID your Anthropic account can access.
-
-Run the backend:
+### 2. Frontend Setup
 
 ```bash
-conda activate voice-interviewer-demo
-cd /Users/arhaan/Demo/backend
-python bot.py -t webrtc --host 127.0.0.1 --port 7860
-```
-
-The Pipecat runner serves:
-
-- `http://127.0.0.1:7860/api/offer`
-- `http://127.0.0.1:7860/client`
-
-## Frontend Setup
-
-Create the frontend env file if needed:
-
-```bash
-cd /Users/arhaan/Demo/frontend
-cp .env.local.example .env.local
-```
-
-Install and run:
-
-```bash
-cd /Users/arhaan/Demo/frontend
+cd frontend
 pnpm install
+
+# Create .env.local
+echo "NEXT_PUBLIC_PIPECAT_BASE_URL=http://localhost:7860" > .env.local
+echo "ANTHROPIC_API_KEY=your-key" >> .env.local
+
 pnpm dev
 ```
 
-Open:
+Open http://localhost:3000
 
-```bash
-http://localhost:3000
+## Features
+
+### Vincent — Your AI Product Strategist
+
+- **Sharp & Direct** — Challenges vague ideas, pushes for specifics
+- **Anti-Form Behavior** — Never feels like a questionnaire
+- **Natural Conversation** — Reacts with substance, not sycophancy
+- **Structured Discovery** — Covers vision, product flow, and technical constraints
+
+### PRD Generation
+
+- **Anti-Compression** — Captures every detail, never summarizes away nuance
+- **User Stories** — Decomposed into buildable pieces with acceptance criteria
+- **Anti-Scope** — Explicitly lists what's NOT in the MVP
+- **Claude-Ready** — One-click copy with implementation prompt
+
+### Voice UI
+
+- **PlasmaVisualizer** — Three.js reactive audio visualization
+- **Live Transcript** — See the conversation in real-time
+- **Debug Panel** — Timing events, latency breakdown
+- **Download/Copy** — Export PRD as markdown
+
+## Architecture
+
+```
+Browser                    Backend                      Services
+┌─────────────┐           ┌─────────────┐              ┌──────────┐
+│  Next.js    │◄─WebRTC──►│   Pipecat   │◄──────────►│ Deepgram │
+│  Frontend   │           │   Pipeline  │              │  (STT)   │
+└─────────────┘           └─────────────┘              └──────────┘
+      │                         │                      ┌──────────┐
+      │                         ├─────────────────────►│ Anthropic│
+      │                         │                      │  (LLM)   │
+      │                         │                      └──────────┘
+      │                         │                      ┌──────────┐
+      │                         └─────────────────────►│ Gradium/ │
+      │                                                │ 11Labs   │
+      │                                                │  (TTS)   │
+      │                                                └──────────┘
+      │
+      ▼
+┌─────────────┐
+│ /api/       │◄─────────────────────────────────────►┌──────────┐
+│ generate-prd│                                       │ Anthropic│
+└─────────────┘                                       │  (PRD)   │
+                                                      └──────────┘
 ```
 
-The frontend uses `http://localhost:7860` by default.
+## Configuration
 
-## Recording Notes
+### Backend Environment Variables
 
-For the best demo take:
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DEEPGRAM_API_KEY` | ✅ | — | STT API key |
+| `ANTHROPIC_API_KEY` | ✅ | — | LLM API key |
+| `TTS_PROVIDER` | ✅ | `elevenlabs` | `gradium` or `elevenlabs` |
+| `GRADIUM_API_KEY` | If gradium | — | Gradium TTS key |
+| `GRADIUM_VOICE_ID` | If gradium | — | Gradium voice ID |
+| `ELEVENLABS_API_KEY` | If elevenlabs | — | ElevenLabs key |
+| `ELEVENLABS_VOICE_ID` | If elevenlabs | — | ElevenLabs voice ID |
+| `ANTHROPIC_MODEL` | ❌ | `claude-3-haiku-20240307` | Model for voice |
 
-- keep candidate answers short and concrete
-- let the recruiter finish one question before answering
-- aim for 4-6 total turns
-- use a real ElevenLabs voice from your account
-- use an Anthropic model that your account can access
+### Frontend Environment Variables
 
-## Latency Notes
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_PIPECAT_BASE_URL` | ✅ | Backend URL (default: `http://localhost:7860`) |
+| `ANTHROPIC_API_KEY` | ✅ | For PRD generation |
 
-The demo is tuned for low perceived latency:
+## Team
 
-- streaming STT with interim handling
-- interruption-friendly turn detection
-- streaming LLM output
-- token-level TTS aggregation
-- backend timing instrumentation for STT, LLM, and TTS stages
+Built by **Arhaan** and **Vishal** for the Pipecat Voice AI Hackathon 2026.
 
-## Development Notes
+## License
 
-- The backend owns prompt behavior, orchestration, timing, and transport.
-- The frontend stays intentionally thin and mostly renders session state.
-- Use-case swaps are mostly isolated to `backend/app/prompts.py` and a small amount of UI copy.
+MIT

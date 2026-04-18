@@ -293,16 +293,9 @@ export function VoiceChat({
 
   const handleCopyClaudePrompt = async () => {
     if (!markdown) return;
-    const claudePrompt = `You are a senior software engineer who builds production-grade systems. You have deep expertise in system design, architecture patterns, and writing clean, maintainable code.
+    const claudePrompt = `You are a staff software engineer at a top-tier tech company who writes clean, production-grade code. I have a PRD for a feature I need to build. Before you write any code, ask me every question you need answered to produce the best possible implementation. Once you have all the context, build the feature step by step.
 
-I want you to use your "plan mode" thinking approach:
-1. First, carefully analyze the requirements in the PRD below
-2. Break down the implementation into logical phases
-3. Identify potential technical challenges and edge cases
-4. Consider scalability, security, and maintainability
-5. Then provide a detailed implementation plan with code
-
-Here is the Product Requirements Document (PRD) that defines what needs to be built:
+Here is the PRD:
 
 ---
 
@@ -310,7 +303,7 @@ ${markdown}
 
 ---
 
-Please analyze this PRD and provide a comprehensive implementation plan followed by the actual code implementation. Start by outlining your approach, then proceed with the implementation.`;
+Please start by asking me any clarifying questions you need before implementation.`;
 
     await navigator.clipboard.writeText(claudePrompt);
     setCopiedPrompt(true);
